@@ -22,7 +22,14 @@
  * - However, the value they add makes it worthwhile to use them when applicable.
  * - Applying to DTO patterns as soon as possible will make it easy for you to maintain and refactor your code.
  */
+
+import { IsNotEmpty} from 'class-validator';
+
+
 export class CreateTaskDto {
+    @IsNotEmpty()
     title: string;
+
+    @IsNotEmpty()
     description: string;
 }
