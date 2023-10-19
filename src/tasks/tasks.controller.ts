@@ -1,19 +1,25 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, Put, Query} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { TaskStatus } from './task-status.enum';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task } from './task.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from '../auth/get-user.decorator';
+import { User } from '../auth/user.entity';
 
 @Controller('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
     constructor(private readonly tasksService: TasksService) {}
 
 
     @Get()
-    getTasks(@Query() filterDto: GetTasksFilterDto): Promise<Task[]> {
-        return this.tasksService.getTasks(filterDto);
+    getTasks(
+        @Query() filterDto: GetTasksFilterDto,
+        @GetUser() user: User
+    ): Promise<Task[]> {
+        return this.tasksService.getTasks(filterDto, user);
     }
 
     @Get('/:id')
@@ -23,9 +29,10 @@ export class TasksController {
 
     @Post()
     createTask(
-        @Body() createTaskDto: CreateTaskDto
+        @Body() createTaskDto: CreateTaskDto,
+        @GetUser() user: User
     ): Promise<Task> {
-        return this.tasksService.createTask(createTaskDto);
+        return this.tasksService.createTask(createTaskDto, user);
     }
 
     @Delete('/:id')
